@@ -3,7 +3,9 @@ An interface to communicate with a VLM/LLM from ROS2, written in Python.
 
 ## Requirements
 Ubuntu 24.04 (Might switch to 22.04)
+
 ROS2 Jazzy (might switch to Humble, should work mostly fine already afaik)
+
 `google-genai` pip package
 
 ## How to use
