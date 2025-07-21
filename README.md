@@ -6,7 +6,7 @@ Ubuntu 24.04 (Might switch to 22.04)
 ROS2 Jazzy (might switch to Humble, should work mostly fine already afaik)
 `google-genai` pip package
 
-## How to install
+## How to use
 First, create a new workspace. We will call this ```vlm_ws```.
 
 Next, make a folder called `src` inside of ```vlm_ws```.
