@@ -1,5 +1,5 @@
 # vlm_communication
-An interface to communicate with a VLM/LLM from ROS2
+An interface to communicate with a VLM/LLM from ROS2, written in Python.
 
 ## Requirements
 Ubuntu 24.04 (Might switch to 22.04)
