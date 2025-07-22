@@ -34,18 +34,20 @@ class MinimalSubscriber(Node):
         self.get_logger().info('AI is thinking...')
         client = genai.Client()
         if "|~|" in msg.data:
-            finalImagePath, finalPrompt = msg.data.split("|~|", 1)
-            with open(finalImagePath, 'rb') as f:
-                image_bytes = f.read()
+            imagePathsStr, finalPrompt = msg.data.split("|~|", 1)
+            imagePaths = [p.strip() for p in imagePathsStr.split(',') if p.strip()]
+            image_parts = []
+            for path in imagePaths:
+                with open(path, 'rb') as f:
+                    image_bytes = f.read()
+                image_parts.append(types.Part.from_bytes(
+                    data=image_bytes,
+                    mime_type='image/jpeg',
+                ))
+            contents = image_parts + [finalPrompt]
             response = client.models.generate_content(
                 model="gemini-2.5-flash",
-                contents=[
-                    types.Part.from_bytes(
-                        data=image_bytes,
-                        mime_type='image/jpeg',
-                    ),
-                    finalPrompt
-                ],
+                contents=contents,
                 config=types.GenerateContentConfig(
                     thinking_config=types.ThinkingConfig(thinking_budget=0) # Disables thinking
                 ),
@@ -58,7 +60,6 @@ class MinimalSubscriber(Node):
                     thinking_config=types.ThinkingConfig(thinking_budget=0) # Disables thinking
                 ),
             )
-
 
         self.get_logger().info(response.text)
 
