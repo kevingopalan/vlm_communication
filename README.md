@@ -1,5 +1,5 @@
 # vlm_communication
-An interface to communicate with a VLM/LLM from ROS2, written in Python.
+An interface to communicate with a VLM/LLM (gemini-2.5-flash) from ROS2, written in Python.
 
 ## Requirements
 Ubuntu 24.04 (Might switch to 22.04)
@@ -19,6 +19,8 @@ Next, go back to your workspace root (vlm_ws) and run this command in the termin
 `rosdep install -i --from-path src --rosdistro jazzy -y #Might switch to humble due to hardware`
 
 Now, run `colcon build --packages select vlm_communication --symlink-install`
+
+Before using this project, you will need to set your API key for Gemini. Run `export GEMINI_API_KEY=<Your api key here>`. Make sure to put in your API key to this command.
 
 If everything built successfully, congrats! Now run 
 `source install/setup.bash` (still in the root of your workspace). Open a new terminal and run the same command.
