@@ -28,8 +28,16 @@ class MinimalPublisher(Node):
         self.i = 0
 
     def timer_callback(self):
+        prompt = String()
+        filePathMsg = String()
+        prompt.data = input("Enter the message you want to send: ")
+        filePathMsg = String()
+        filePathMsg.data = input("Enter the file path to the file you want to send: ")
         msg = String()
-        msg.data = input("Enter the message you want to send: ")
+        if filePathMsg.data == "":
+            msg.data = prompt.data
+        else:
+            msg.data = filePathMsg.data + "|~|" + prompt.data
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.data)
         self.i += 1

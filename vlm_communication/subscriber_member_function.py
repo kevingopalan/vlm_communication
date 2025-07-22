@@ -31,15 +31,35 @@ class MinimalSubscriber(Node):
         self.subscription  # prevent unused variable warning
 
     def listener_callback(self, msg):
-        self.get_logger().info('Request sent to AI')
+        self.get_logger().info('AI is thinking...')
         client = genai.Client()
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=msg.data,
-            config=types.GenerateContentConfig(
-                thinking_config=types.ThinkingConfig(thinking_budget=0) # Disables thinking
-            ),
-        )
+        if "|~|" in msg.data:
+            finalImagePath, finalPrompt = msg.data.split("|~|", 1)
+            with open(finalImagePath, 'rb') as f:
+                image_bytes = f.read()
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=[
+                    types.Part.from_bytes(
+                        data=image_bytes,
+                        mime_type='image/jpeg',
+                    ),
+                    finalPrompt
+                ],
+                config=types.GenerateContentConfig(
+                    thinking_config=types.ThinkingConfig(thinking_budget=0) # Disables thinking
+                ),
+            )
+        else:
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=msg.data,
+                config=types.GenerateContentConfig(
+                    thinking_config=types.ThinkingConfig(thinking_budget=0) # Disables thinking
+                ),
+            )
+
+
         self.get_logger().info(response.text)
 
 
