@@ -30,4 +30,4 @@ Now, in one terminal, run
 In the other terminal, run 
 `ros2 run vlm_communication server_subscriber_script`
 
-If everything was done correctly, you should be able to type your prompt in the publisher script window and an AI response should appear in the other. This project will turn into something bigger, and stuff will change quite a bit, including ROS versions (which is very likely). For now, here it is.
+Now, type in your prompt and put in any image paths (separated by commas) when prompted. Leave blank if no images are to be submitted. If everything was done correctly, you should be able to type your prompt in the publisher script window and an AI response should appear in the other. This project will turn into something bigger, and stuff will change quite a bit, including ROS versions (which is very likely). For now, here it is.
