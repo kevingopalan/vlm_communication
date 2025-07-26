@@ -6,8 +6,6 @@ Ubuntu 24.04 (Might switch to 22.04)
 
 ROS2 Jazzy (might switch to Humble, should work mostly fine already afaik)
 
-`google-genai` pip package
-
 ## How to use
 First, create a new workspace. We will call this `vlm_ws`.
 
@@ -18,7 +16,10 @@ Inside of src, clone this repository into a folder called `vlm_communication`.
 Next, go back to your workspace root (vlm_ws) and run this command in the terminal: 
 `rosdep install -i --from-path src --rosdistro jazzy -y #Might switch to humble due to hardware`
 
+As part of the process, you will also need to install the pip package for `google-genai`. For that, you will need to run `pip3 install -q -U google-genai --break-system-packages`. Since there is no debian package (as far as I know) for google-genai, it is perfectly fine to use --break-system-packages for now until I figure out how to get a virtual env to work with ROS2 or until a more permanent fix is found
+
 Now, run `colcon build --packages select vlm_communication --symlink-install`
+- `colcon build --symlink-install` works fine too, it simply would be a waste of time to build all the packages at once if we integrate with a real robot later.
 
 Before using this project, you will need to set your API key for Gemini. Run `export GEMINI_API_KEY=<Your api key here>`. Make sure to put in your API key to this command.
 
