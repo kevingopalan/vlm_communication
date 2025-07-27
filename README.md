@@ -34,3 +34,6 @@ In the other terminal, run
 `ros2 run vlm_communication server_subscriber_script`
 
 Now, type in your prompt and put in any image paths (separated by commas) when prompted. Leave blank if no images are to be submitted. If everything was done correctly, you should be able to type your prompt in the publisher script window and an AI response should appear in the other. This project will turn into something bigger, and stuff will change quite a bit, including ROS versions (which is very likely). For now, here it is.
+
+
+To use with multiple computers, you will need to run this command on both PCs: `export ROS_DOMAIN_ID=<Put domain ID here>`, replacing `<Put domain ID here>` with a number. The same number has to be used on both computers. Domain IDs between the numbers 0-101 and 215-232 can be used. Right now, multi-computer support isn't great as there are bugs (like how it looks for the file path on the server instead of the robot, not really a bug but a mistake on my part when making the logic, also it crashes when something doesn't correspond to what is expected due to lack of error handling), and features that are yet to be implemented (allowing for raw image bytes from a real robot, automatic preset prompts, writing to files, etc.) but I plan to fix/add them in the near future.
