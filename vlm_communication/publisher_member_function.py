@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import rclpy
 from rclpy.node import Node
-
 from std_msgs.msg import String
+import base64
+import os
 
 
 class MinimalPublisher(Node):
@@ -36,8 +38,18 @@ class MinimalPublisher(Node):
         if filePathsMsg.data.strip() == "":
             msg.data = prompt.data
         else:
-            cleanedPaths = ','.join([p.strip() for p in filePathsMsg.data.split(',') if p.strip()])
-            msg.data = cleanedPaths + "|~|" + prompt.data
+            cleanedPaths = [p.strip() for p in filePathsMsg.data.split(',') if p.strip()]
+            image_data_list = []
+            for path in cleanedPaths:
+                if os.path.isfile(path):
+                    with open(path, 'rb') as f:
+                        image_bytes = f.read()
+                    image_b64 = base64.b64encode(image_bytes).decode('utf-8')
+                    image_data_list.append(image_b64)
+                else:
+                    self.get_logger().warn(f"File not found: {path}")
+            # Join base64 images with a separator and add prompt
+            msg.data = '|~|'.join(image_data_list) + '|~|' + prompt.data
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.data)
         self.i += 1

@@ -15,9 +15,11 @@
 import rclpy
 from rclpy.node import Node
 
+
 from std_msgs.msg import String
 from google import genai
 from google.genai import types
+import base64
 
 class MinimalSubscriber(Node):
 
@@ -34,16 +36,17 @@ class MinimalSubscriber(Node):
         self.get_logger().info('AI is thinking...')
         client = genai.Client()
         if "|~|" in msg.data:
-            imagePathsStr, finalPrompt = msg.data.split("|~|", 1)
-            imagePaths = [p.strip() for p in imagePathsStr.split(',') if p.strip()]
+            parts = msg.data.split("|~|")
+            image_b64_list = parts[:-1]
+            finalPrompt = parts[-1]
             image_parts = []
-            for path in imagePaths:
-                with open(path, 'rb') as f:
-                    image_bytes = f.read()
-                image_parts.append(types.Part.from_bytes(
-                    data=image_bytes,
-                    mime_type='image/jpeg',
-                ))
+            for image_b64 in image_b64_list:
+                if image_b64:
+                    image_bytes = base64.b64decode(image_b64)
+                    image_parts.append(types.Part.from_bytes(
+                        data=image_bytes,
+                        mime_type='image/jpeg',
+                    ))
             contents = image_parts + [finalPrompt]
             response = client.models.generate_content(
                 model="gemini-2.5-flash",
