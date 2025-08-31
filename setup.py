@@ -22,6 +22,8 @@ setup(
         'console_scripts': [
                 'robot_publisher_script = vlm_communication.publisher_member_function:main',
                 'server_subscriber_script = vlm_communication.subscriber_member_function:main',
+                'genmapimg = vlm_communication.genmapimg:main',
+                'genmapimg_with_vlm = vlm_communication.genmapimg_with_vlm:main',
         ],
     },
 )
