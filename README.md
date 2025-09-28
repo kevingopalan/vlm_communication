@@ -50,7 +50,7 @@ First, run the subscriber script with `ros2 run vlm_communication server_subscri
 
 Next, run the genmapimg script with `ros2 run vlm_communication genmapimg_with_vlm --ros-args -p map_yaml_path:=<put your map yaml path here>`, replacing `<put your map yaml path here>` with your actual map yaml path.
 
-If all is well, it should make a map with the costmap, robot position, and navigation path overlayed on top of the global map. This map is saved to the maps folder in `<your workspace>/src/vlm_communication/vlm_communication/maps`. However, this one also queries the VLM to give a hazard rating from 1 to 10 and a description of the situation.
+If all is well, it should make a map with the costmap, robot position, and navigation path overlayed on top of the global map. This map is saved to the maps folder in `<your workspace>/src/vlm_communication/vlm_communication/maps`. However, this one also queries the VLM to give a hazard rating from 1 to 10 and a description of the situation, and is logged in the terminal of the subscriber script.
 
 > <span style="color:yellow;">IMPORTANT!</span> Make sure that the .pgm file of the map you saved for navigation is in the same directory and has the same name as the YAML file, or it will not work!
 
