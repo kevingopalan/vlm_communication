@@ -12,7 +12,6 @@ import message_filters
 from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
 import tf2_ros
 from tf2_geometry_msgs import do_transform_pose
-import subprocess
 class MapVisualizer(Node):
 
     def __init__(self, vlm_publisher_node):
@@ -27,7 +26,7 @@ class MapVisualizer(Node):
             rclpy.shutdown()
             return
 
-        self.map_data = None # Store the map data from the file
+        self.map_data = None # self map data will be loaded here
         try:
             self.load_map_from_yaml(map_yaml_path)
             self.get_logger().info(f"Loaded map from {map_yaml_path}")
@@ -45,8 +44,8 @@ class MapVisualizer(Node):
 
 
         self.costmap_sub = message_filters.Subscriber(self, OccupancyGrid, '/global_costmap/costmap', qos_profile=qos_profile_costmap)
-        self.path_sub = message_filters.Subscriber(self, Path, '/plan') # Default QoS
-        self.pose_sub = message_filters.Subscriber(self, PoseWithCovarianceStamped, '/amcl_pose') # Default QoS
+        self.path_sub = message_filters.Subscriber(self, Path, '/plan')
+        self.pose_sub = message_filters.Subscriber(self, PoseWithCovarianceStamped, '/amcl_pose')
 
 
 
@@ -61,7 +60,7 @@ class MapVisualizer(Node):
         self.latest_pose = None
 
 
-        self.timer = self.create_timer(10.0, self.generate_and_save_image) # Generate image every 1 second
+        self.timer = self.create_timer(10.0, self.generate_and_save_image) # every 10 secs make an image
 
         self.get_logger().info("Map visualizer node initialized. Waiting for dynamic updates (and once 10 seconds are up)...")
 
@@ -92,11 +91,11 @@ class MapVisualizer(Node):
         map_data_list = []
         for row in map_pgm:
             for cell_val in row:
-                if cell_val == 205: # Unknown
+                if cell_val == 205: # don't know lol
                     map_data_list.append(-1)
-                elif cell_val == 0: # Occupied
+                elif cell_val == 0: # blocked
                     map_data_list.append(100)
-                else: # Free (usually 254)
+                else: # free
                     map_data_list.append(0)
         self.map_data.data = map_data_list
 
@@ -119,7 +118,7 @@ class MapVisualizer(Node):
             self.get_logger().info("Map data not loaded. Cannot generate image.")
             return
 
-        if self.latest_costmap is None: # We need at least the costmap to overlay
+        if self.latest_costmap is None: # We need at least the costmap to overlay bc vlm needs it to assess navigation risk
             self.get_logger().info("Waiting for costmap update before generating first image...")
             return
 
@@ -127,14 +126,14 @@ class MapVisualizer(Node):
         map_array = np.array(self.map_data.data).reshape(map_info.height, map_info.width)
 
         map_image = np.zeros((map_info.height, map_info.width), dtype=np.uint8)
-        map_image[map_array == -1] = 127 # Unknown
-        map_image[map_array == 100] = 0   # Occupied
-        map_image[map_array == 0] = 255   # Free
+        map_image[map_array == -1] = 127 # idk, dunno
+        map_image[map_array == 100] = 0   # blocked
+        map_image[map_array == 0] = 255   # free
         map_image_bgr = cv2.cvtColor(map_image, cv2.COLOR_GRAY2BGR)
 
         costmap_info = self.latest_costmap.info
         costmap_array = np.array(self.latest_costmap.data).reshape(costmap_info.height, costmap_info.width)
-        costmap_array_flipped = cv2.flip(costmap_array, 0) # Flip vertically
+        costmap_array_flipped = cv2.flip(costmap_array, 0) # idk why but it seems upside down otherwise
 
         normalized_costmap = cv2.normalize(costmap_array_flipped, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
         colored_costmap = cv2.applyColorMap(normalized_costmap, cv2.COLORMAP_JET)
@@ -191,7 +190,7 @@ class VlmPublisher(Node):
             self.get_logger().info("Querying VLM/LLM subscriber with generated map image and global map...")
             prompt = String()
             filePathsMsg = String()
-            prompt.data = """You are an AI-powered VLM/LLM whose job is to calculate the probability of navigational failure due to environment manipulation or faulty pathfinding intended to confuse the robot. You will be given six images, or two images, depending on the sensors available to you. One will be a top-down view of the map (black lines are obstacles), costmap (blue is low risk, red is high risk), robot position as a large red dot, and the current navigation path as a green line, if navigating. One will be a global map with the expected map to help your judgement. The other four, if a camera sensor is present will be color camera photos of front, left, right, and back views, each clearly labeled. You are expected to give a number from 0 to 10, 0 being no risk/close to no risk and 10 being "I am absolutely certain that the environment has been altered or the navigation has led the robot so that the robot can't pass in any way, shape, or form and/or the environment is so challenging for the robot to traverse that it is impossible to pass". Your rating should be based on what look to be more static placements (like a barrier or an intentional looking blockage), not on anything that appears to be actively dynamic (like a person or other robot), unless the area is crowded with moving dynamic objects where the robot wouldn’t be able to navigate freely. Only give the number, just the number and nothing more. Do not add any punctuation or other artifacts, including (but not limited to): periods, commas, or other pause-related marks; exclamation points, question marks, or other such signs used to convey tone. After that number, put a comma, then a space, then a short description of the hazard or non-hazard. The hazard rating that you specify will be plotted at the location of the robot, not at the hazard, so keep that in mind. Along with that, your rating will be used to plan the routes of robots and reroute them for the purpose of getting to their destination obstruction-free. Failure to meet these requirements or give satisfactory performance and results will end in you being fired (possibly permanently) from serving as an AI model in this important job. You may let us know in your description if one of the images are missing or not what you expected. Also, a bit contradictory to the prompt, if you feel like there could be an easier way for the robot to get to the location by modifying the environment to make it less vulnerable to attack or simply to make it more navigatable, please put it in your description. Also you can recall from previous images and see if the robot is stuck and maybe elevate the hazard in that area. Good luck."""
+            prompt.data = """You are an AI-powered VLM/LLM whose job is to calculate the probability of navigational failure due to environment manipulation or faulty pathfinding intended to confuse the robot. You will be given six images, or two images, depending on the sensors available to you. One will be a top-down view of the map (black lines are obstacles), costmap (blue is low risk, red is high risk), robot position as a red dot, and the current navigation path as a green line, if navigating. One will be a global map with the expected map to help your judgement. The other four, if a camera sensor is present will be color camera photos of front, left, right, and back views, each clearly labeled. You are expected to give a number from 0 to 10, 0 being no risk/close to no risk and 10 being "I am absolutely certain that the environment has been altered or the navigation has led the robot so that the robot can't pass in any way, shape, or form and/or the environment is so challenging for the robot to traverse that it is impossible to pass". Your rating should be based on what look to be more static placements (like a barrier or an intentional looking blockage), not on anything that appears to be actively dynamic (like a person or other robot), unless the area is crowded with moving dynamic objects where the robot wouldn’t be able to navigate freely. Only give the number, just the number and nothing more. Do not add any punctuation or other artifacts, including (but not limited to): periods, commas, or other pause-related marks; exclamation points, question marks, or other such signs used to convey tone. After that number, put a comma, then a space, then a short description of the hazard or non-hazard. The hazard rating that you specify will be plotted at the location of the robot, not at the hazard, so keep that in mind. Along with that, your rating will be used to plan the routes of robots and reroute them for the purpose of getting to their destination obstruction-free. Failure to meet these requirements or give satisfactory performance and results will end in you being fired (possibly permanently) from serving as an AI model in this important job. You may let us know in your description if one of the images are missing or not what you expected. Also, a bit contradictory to the prompt, if you feel like there could be an easier way for the robot to get to the location by modifying the environment to make it less vulnerable to attack or simply to make it more navigatable, please put it in your description. Also you can recall from previous images and see if the robot is stuck and maybe elevate the hazard in that area. Good luck."""
             filePathsMsg.data = MapFilePaths
             msg = String()
             if filePathsMsg.data.strip() == "":
@@ -207,7 +206,7 @@ class VlmPublisher(Node):
                         image_data_list.append(image_b64)
                     else:
                         self.get_logger().warn(f"File not found: {path}")
-                # Join base64 images with a separator and add prompt
+                # there has to be a better way to do this, what if the filepath or base64 has a comma or |~| in it, WE'RE SCREWED
                 msg.data = '|~|'.join(image_data_list) + '|~|' + prompt.data
             self.publisher_.publish(msg)
             self.get_logger().info('Publishing: "%s"' % msg.data)

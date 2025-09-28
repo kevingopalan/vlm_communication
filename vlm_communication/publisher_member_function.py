@@ -48,7 +48,6 @@ class MinimalPublisher(Node):
                     image_data_list.append(image_b64)
                 else:
                     self.get_logger().warn(f"File not found: {path}")
-            # Join base64 images with a separator and add prompt
             msg.data = '|~|'.join(image_data_list) + '|~|' + prompt.data
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.data)
