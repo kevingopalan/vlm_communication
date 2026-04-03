@@ -58,7 +58,7 @@ class MapVisualizer(Node):
         self.latest_pose = None
 
 
-        self.timer = self.create_timer(10.0, self.generate_and_save_image) # Generate image every 1 second
+        self.timer = self.create_timer(10.0, self.generate_and_save_image) # Generate image every 10 second
 
         self.get_logger().info("Map visualizer node initialized. Waiting for dynamic updates (and once 60 seconds are up)...")
 
