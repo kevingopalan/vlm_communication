@@ -15,6 +15,8 @@ Inside of src, clone this repository into a folder called `vlm_communication`.
 
 Now, source your ROS2 installation with `source /opt/ros/jazzy/setup.bash` (or if on Humble, run `source /opt/ros/humble/setup.bash`)
 
+If rosdep isn't initialized, then run `sudo rosdep init` then `rosdep update` (if it isn't initialized, `rosdep install` will tell you anyways)
+
 Next, go back to your workspace root (vlm_ws) and run this command in the terminal: 
 `rosdep install -i --from-path src --rosdistro jazzy -y` (or if on Humble, run `rosdep install -i --from-path src --rosdistro humble -y`)
 
