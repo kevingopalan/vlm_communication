@@ -4,7 +4,7 @@ An interface to communicate with a VLM/LLM (gemini-2.5-flash) from ROS2, written
 ## Requirements
 - Ubuntu 24.04/22.04
 - ROS2 Jazzy/Humble
-- WeBots R2025a (with turtlebot3 simulation)
+- WeBots R2025a with turtlebot3 simulation (for demos), may be replaced with gazebo in the near future
 
 ## How to use
 First, create a new workspace. We will call this `vlm_ws`.
