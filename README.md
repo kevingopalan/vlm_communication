@@ -21,7 +21,7 @@ Next, go back to your workspace root (vlm_ws) and run this command in the termin
 `rosdep install -i --from-path src --rosdistro jazzy -y` (or if on Humble, run `rosdep install -i --from-path src --rosdistro humble -y`)
 
 As part of the process, you will also need to install the pip package for `google-genai`. For that, you will need to run `pip3 install -q -U google-genai`. If pip3 isn't installed, first do `sudo apt install python3-pip`, then retry the command. 
-> Since there is no debian package (as far as I know) for google-genai, it is perfectly fine to use `--break-system-packages` (if you get an error of an externally managed environment), and if you know what you are doing, you may use a venv (although I haven't done that for the sake of simplicity).
+> Since there is no debian package (as far as I know) for google-genai, it is perfectly fine to use `--break-system-packages` (if you get an error of an externally managed environment), and if you know what you are doing, you may use a venv which is generally advised.
 
 Now, run `colcon build --packages-select vlm_communication --symlink-install`
 - `colcon build --symlink-install` works fine too, it simply would be a waste of time to build all the packages at once if we integrate with a real robot later.
