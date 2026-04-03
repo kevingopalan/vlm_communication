@@ -2,9 +2,9 @@
 An interface to communicate with a VLM/LLM (gemini-2.5-flash) from ROS2, written in Python.
 
 ## Requirements
-Ubuntu 24.04/22.04
-
-ROS2 Jazzy/Humble
+- Ubuntu 24.04/22.04
+- ROS2 Jazzy/Humble
+- WeBots R2025a (with turtlebot3 simulation)
 
 ## How to use
 First, create a new workspace. We will call this `vlm_ws`.
